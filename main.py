@@ -1,6 +1,7 @@
+import argparse
 import time
-from ctypes import CDLL, c_double
 import pathlib
+from ctypes import CDLL, c_double
 from math import sin, cos, asin, sqrt, radians, tan, atan2, pi
 from geopy.distance import great_circle, geodesic
 
@@ -114,7 +115,7 @@ georef_func = load_cdll('georef', 'DistGreatCircle')
 georef_func.__name__ = 'C++ Geo Great Circle'
 
 
-if __name__ == '__main__':
+def test_time_consuming():
     print('%30s %13s %10s' % ('Function', 'Distance (m)', 'Time (s)'))
     test_dist_func(great_circle)
     test_dist_func(geodesic)
@@ -123,35 +124,41 @@ if __name__ == '__main__':
     test_dist_func(georef_func)
     test_dist_func(vincenty_func)
 
-    # with open('locations.txt', 'r') as f:
-    #     locations = [list(map(float, s.split())) for s in f.readlines()]
 
-    # funcs = [great_circle, custom_great_circle,
-    #          georef_func, custom_geodesic, vincenty_func]
-    # max_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
-    # p_max_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
-    # sum_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
-    # p_sum_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
+def test_accuracy():
+    with open('locations.txt', 'r') as f:
+        locations = [list(map(float, s.split())) for s in f.readlines()]
 
-    # print(len(locations))
-    # for loc in locations:
-    #     p1 = (loc[0], loc[1])
-    #     p2 = (loc[2], loc[3])
-    #     dist = geodesic(p1, p2).meters
-    #     for i, func in enumerate(funcs):
-    #         if func.__name__ in ('C++ Geodesic', 'C++ Geo Great Circle'):
-    #             d = func(*loc)
-    #         else:
-    #             d = func(p1, p2).meters
-    #         diff = abs(dist-d)
-    #         max_diff[i] = max(max_diff[i], diff)
-    #         sum_diff[i] += diff
-    #         p_max_diff[i] = max(p_max_diff[i], diff/dist*100.0)
-    #         p_sum_diff[i] += diff/dist*100.0
+    funcs = [great_circle, custom_great_circle,
+             georef_func, custom_geodesic, vincenty_func]
+    max_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
+    p_max_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
+    sum_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
+    p_sum_diff = [0.0, 0.0, 0.0, 0.0, 0.0]
 
-    # print(max_diff)
-    # print(*map(lambda s: s/len(locations), sum_diff))
-    # print(p_max_diff)
-    # print(*map(lambda s: s/len(locations), p_sum_diff))
+    print(len(locations))
+    for loc in locations:
+        p1 = (loc[0], loc[1])
+        p2 = (loc[2], loc[3])
+        dist = geodesic(p1, p2).meters
+        for i, func in enumerate(funcs):
+            if func.__name__ in ('C++ Geodesic', 'C++ Geo Great Circle'):
+                d = func(*loc)
+            else:
+                d = func(p1, p2).meters
+            diff = abs(dist-d)
+            max_diff[i] = max(max_diff[i], diff)
+            sum_diff[i] += diff
+            p_max_diff[i] = max(p_max_diff[i], diff/dist*100.0)
+            p_sum_diff[i] += diff/dist*100.0
+    print(max_diff)
+    print(*map(lambda s: s/len(locations), sum_diff))
+    print(p_max_diff)
+    print(*map(lambda s: s/len(locations), p_sum_diff))
 
-    # # GC , custom GC, C++ GC, custom Geo, C++ Geo
+    # GC , custom GC, C++ GC, custom Geo, C++ Geo
+
+
+if __name__ == '__main__':
+    test_time_consuming()
+    # test_accuracy()
