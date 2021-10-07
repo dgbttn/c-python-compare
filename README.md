@@ -1,4 +1,4 @@
-# C .vs Python Testing
+# C vs. Python Testing
 
 Test with accuracy and time consuming of geolocation distance calculators
 
