@@ -1,6 +1,6 @@
 # C vs. Python Testing
 
-Test with accuracy and time consuming of geolocation distance calculators
+Test with time consuming of geolocation distance calculators
 
 ### Requirements
 
